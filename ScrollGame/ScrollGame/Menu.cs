@@ -9,7 +9,6 @@ namespace ScrollGame
 {
     class Menu
     {
-        Game1 game;
         SpriteFont font;
 
         Vector2 position;

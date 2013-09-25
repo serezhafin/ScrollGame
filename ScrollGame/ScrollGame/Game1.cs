@@ -23,14 +23,20 @@ namespace ScrollGame
         // Элементы
         SpriteFont font;
         Texture2D main;
+        Texture2D enemy;
+        Texture2D bckg;
         Song song;
 
         // Положение главного героя
         int mainX, mainY;
+        // Положение противника
+        int enemyX, enemyY;
 
         // Подгрузка классов
         AnimationMain MainAnimation;
+        EnemyAnimation AnimationEnemy;
         Music Music;
+        Background scrolling1;
 
         public Game1()
         {
@@ -39,6 +45,9 @@ namespace ScrollGame
 
             mainX = 300;
             mainY = 300;
+
+            enemyX = 100;
+            enemyY = 100;
         }
 
         /// <summary>
@@ -66,11 +75,16 @@ namespace ScrollGame
             // Загрузка контента
             font = Content.Load<SpriteFont>("SpriteFont1");
             main = Content.Load<Texture2D>("main");
+            enemy = Content.Load<Texture2D>("enemy1");
             song = Content.Load<Song>("music");
+            bckg = Content.Load<Texture2D>("background");
+            
 
             // Создание объектов класса
             MainAnimation = new AnimationMain(new Rectangle(mainX, mainY, 50, 50), main, this, font);
-            Music = new Music(song); Music.Play();
+            AnimationEnemy = new EnemyAnimation(enemy, new Rectangle(enemyX, enemyY, 50, 50));
+            scrolling1 = new Background(bckg, new Rectangle(0, 0, 800, 500), GraphicsDevice.Viewport.Height, GraphicsDevice.Viewport.Width);
+           // Music = new Music(song); Music.Play();
 
             
         }
@@ -96,7 +110,9 @@ namespace ScrollGame
                 this.Exit();
 
             MainAnimation.Update(gameTime);
-            Music.Volume();
+            AnimationEnemy.Update(gameTime);
+            scrolling1.Update();
+           // Music.Volume();
 
             base.Update(gameTime);
         }
@@ -108,7 +124,16 @@ namespace ScrollGame
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
+
+
+            spriteBatch.Begin();
+            scrolling1.Draw(spriteBatch);
+            spriteBatch.End();
+
+
             MainAnimation.Draw(spriteBatch);
+            AnimationEnemy.Draw(spriteBatch);
+            
             base.Draw(gameTime);
         }
     }
