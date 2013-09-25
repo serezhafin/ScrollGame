@@ -30,7 +30,7 @@ namespace ScrollGame
         protected override void LoadContent()
         {
             spriteBatch = new SpriteBatch(GraphicsDevice);
-            spriteFont = content.Load<SpriteFont>("Content\\SpriteFont1");
+            spriteFont = content.Load<SpriteFont>("Content\\SpriteFont2");
         }
 
         public override void Update(GameTime gameTime)

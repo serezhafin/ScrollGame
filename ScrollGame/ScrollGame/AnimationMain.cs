@@ -51,9 +51,9 @@ namespace ScrollGame
         {
             KeyboardState keyState = Keyboard.GetState();
             if (keyState.IsKeyDown(Keys.Left) && position.Left+10 >0)
-                position.X -= 5;
+                position.X -= 9;
             if (keyState.IsKeyDown(Keys.Right) && position.Right-10 < game.GraphicsDevice.Viewport.Width)
-                position.X += 5;
+                position.X += 9;
             if (keyState.IsKeyDown(Keys.Up) && position.Top > 0)
                 position.Y -= 5;
             if (keyState.IsKeyDown(Keys.Down) && position.Bottom < game.GraphicsDevice.Viewport.Height)
