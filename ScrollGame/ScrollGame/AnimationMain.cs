@@ -17,7 +17,7 @@ namespace ScrollGame
 
         Texture2D main;
 
-        Rectangle position;
+        public Rectangle position;
 
         int frameWidth, frameHeight;
         public int FrameCount { get { return main.Width / frameWidth; } }

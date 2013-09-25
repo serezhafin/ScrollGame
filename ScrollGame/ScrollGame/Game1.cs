@@ -25,6 +25,7 @@ namespace ScrollGame
         Texture2D main;
         Texture2D enemy;
         Texture2D bckg;
+        Texture2D bulletTexture;
         Song song;
 
         // Положение главного героя
@@ -33,9 +34,11 @@ namespace ScrollGame
         int enemyX, enemyY;
 
         // Подгрузка классов
+        KeyboardState pastKey;
         AnimationMain MainAnimation;
         EnemyAnimation AnimationEnemy;
-        Music Music;
+        List<Bullets> bullets = new List<Bullets>();
+       // Music Music;
         Background scrolling1;
 
         public Game1()
@@ -78,13 +81,15 @@ namespace ScrollGame
             enemy = Content.Load<Texture2D>("enemy1");
             song = Content.Load<Song>("music");
             bckg = Content.Load<Texture2D>("background");
+            bulletTexture = Content.Load<Texture2D>("bullet");
             
 
             // Создание объектов класса
             MainAnimation = new AnimationMain(new Rectangle(mainX, mainY, 50, 50), main, this, font);
             AnimationEnemy = new EnemyAnimation(enemy, new Rectangle(enemyX, enemyY, 50, 50));
+            //Bullet = new Bullets(bulletTexture, new Rectangle(mainX, mainY, 50, 50));
             scrolling1 = new Background(bckg, new Rectangle(0, 0, 800, 500), GraphicsDevice.Viewport.Height, GraphicsDevice.Viewport.Width);
-           // Music = new Music(song); Music.Play();
+            //Music = new Music(song); Music.Play();
 
             
         }
@@ -108,14 +113,50 @@ namespace ScrollGame
             // Allows the game to exit
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
                 this.Exit();
+            if (Keyboard.GetState().IsKeyDown(Keys.Space) && pastKey.IsKeyUp(Keys.Space))
+                Shoot();
+
+            pastKey = Keyboard.GetState();
+
+            UpdateBullets();
 
             MainAnimation.Update(gameTime);
             AnimationEnemy.Update(gameTime);
             scrolling1.Update();
+            
            // Music.Volume();
 
             base.Update(gameTime);
         }
+
+        public void UpdateBullets()
+        {
+            foreach (Bullets bullet in bullets)
+            {
+                bullet.bulletPosition.Y -= 4;
+                if (Math.Abs(bullet.bulletPosition.Y - mainY) > 500)
+                    bullet.isVisible = false;
+            }
+
+            for (int i = 0; i < bullets.Count; i++)
+            {
+                if (!bullets[i].isVisible)
+                {
+                    bullets.RemoveAt(i);
+                    i--;
+                }
+            }
+        }
+
+        public void Shoot()
+        {
+            Bullets newBullet = new Bullets(bulletTexture, new Rectangle(MainAnimation.position.X, MainAnimation.position.Y, 50, 50));
+            newBullet.isVisible = true;
+
+            if (bullets.Count < 20)
+                bullets.Add(newBullet);
+        }
+
 
         /// <summary>
         /// This is called when the game should draw itself.
@@ -128,6 +169,8 @@ namespace ScrollGame
 
             spriteBatch.Begin();
             scrolling1.Draw(spriteBatch);
+            foreach (Bullets bullet in bullets)
+                bullet.Draw(spriteBatch);
             spriteBatch.End();
 
 

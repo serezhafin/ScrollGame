@@ -109,6 +109,7 @@
   <ItemGroup>
     <Compile Include="AnimationMain.cs" />
     <Compile Include="Background.cs" />
+    <Compile Include="Bullets.cs" />
     <Compile Include="EnemyAnimation.cs" />
     <Compile Include="Menu.cs" />
     <Compile Include="Music.cs" />
