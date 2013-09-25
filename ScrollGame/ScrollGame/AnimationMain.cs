@@ -11,7 +11,7 @@ namespace ScrollGame
     class AnimationMain
     {
         Game1 game;
-        Menu menu;
+        
 
         Vector2 coordPosition;
 
@@ -24,7 +24,7 @@ namespace ScrollGame
 
         int currentFrame, timeElasped, timeForFrame = 100;
 
-        public AnimationMain(Rectangle rect, Texture2D texture, Game1 game, SpriteFont font)
+        public AnimationMain(Rectangle rect, Texture2D texture, Game1 game)
         {
             this.position = rect;
             this.main = texture;
@@ -33,7 +33,7 @@ namespace ScrollGame
             frameHeight = 50;
 
             coordPosition = new Vector2(20, 20);
-            menu = new Menu(coordPosition, font);
+           
         }
 
         public void Update(GameTime gameTime)
@@ -50,13 +50,13 @@ namespace ScrollGame
         public void Controls()
         {
             KeyboardState keyState = Keyboard.GetState();
-            if (keyState.IsKeyDown(Keys.Left))
+            if (keyState.IsKeyDown(Keys.Left) && position.Left+10 >0)
                 position.X -= 5;
-            if (keyState.IsKeyDown(Keys.Right))
+            if (keyState.IsKeyDown(Keys.Right) && position.Right-10 < game.GraphicsDevice.Viewport.Width)
                 position.X += 5;
-            if (keyState.IsKeyDown(Keys.Up))
+            if (keyState.IsKeyDown(Keys.Up) && position.Top > 0)
                 position.Y -= 5;
-            if (keyState.IsKeyDown(Keys.Down))
+            if (keyState.IsKeyDown(Keys.Down) && position.Bottom < game.GraphicsDevice.Viewport.Height)
                 position.Y += 5;
                 
         }
@@ -67,7 +67,6 @@ namespace ScrollGame
             spriteBatch.Begin();
             spriteBatch.Draw(main, position, sourceRect, Color.White);
             spriteBatch.End();
-            menu.Draw(spriteBatch, "X: " + position.X + "\n" + "Y: " + position.Y);
         }
     }
 }

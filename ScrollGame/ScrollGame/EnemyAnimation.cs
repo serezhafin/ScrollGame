@@ -10,7 +10,8 @@ namespace ScrollGame
     class EnemyAnimation
     {
         Texture2D enemy;
-        Rectangle position;
+        public Rectangle position;
+        public bool isVisible;
 
         int frameWidth, frameHeight;
         public int FrameCount { get { return enemy.Width / frameWidth; } }
@@ -38,9 +39,9 @@ namespace ScrollGame
         public void Draw(SpriteBatch spriteBatch)
         {
             Rectangle sourceRect = new Rectangle(frameHeight * currentFrame, 0, frameWidth, frameHeight);
-            spriteBatch.Begin();
+            
             spriteBatch.Draw(enemy, position, sourceRect, Color.White);
-            spriteBatch.End();
+            
         }
     }
 }

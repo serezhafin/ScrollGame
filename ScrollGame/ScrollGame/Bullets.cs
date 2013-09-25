@@ -25,11 +25,6 @@ namespace ScrollGame
             bulletPosition.Width = 6;
         }
 
-        public void Update()
-        {
-            bulletPosition.Y -= 4;
-        }
-
         public void Draw(SpriteBatch spriteBatch)
         {
             spriteBatch.Draw(bullet, bulletPosition, Color.White);

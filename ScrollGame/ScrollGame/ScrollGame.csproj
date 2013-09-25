@@ -111,6 +111,7 @@
     <Compile Include="Background.cs" />
     <Compile Include="Bullets.cs" />
     <Compile Include="EnemyAnimation.cs" />
+    <Compile Include="FPSCounter.cs" />
     <Compile Include="Menu.cs" />
     <Compile Include="Music.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

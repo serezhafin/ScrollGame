@@ -33,13 +33,19 @@ namespace ScrollGame
         // Положение противника
         int enemyX, enemyY;
 
+        // Системная информация
+        bool isShowInformation = false;
+
         // Подгрузка классов
+        Random rand;
         KeyboardState pastKey;
+        KeyboardState pastKey2;
         AnimationMain MainAnimation;
-        EnemyAnimation AnimationEnemy;
         List<Bullets> bullets = new List<Bullets>();
-       // Music Music;
+        List<EnemyAnimation> Enemies = new List<EnemyAnimation>();
         Background scrolling1;
+       // Music Music;
+        
 
         public Game1()
         {
@@ -51,6 +57,8 @@ namespace ScrollGame
 
             enemyX = 100;
             enemyY = 100;
+
+            this.Components.Add(new FPSCounter(this));
         }
 
         /// <summary>
@@ -85,9 +93,8 @@ namespace ScrollGame
             
 
             // Создание объектов класса
-            MainAnimation = new AnimationMain(new Rectangle(mainX, mainY, 50, 50), main, this, font);
-            AnimationEnemy = new EnemyAnimation(enemy, new Rectangle(enemyX, enemyY, 50, 50));
-            //Bullet = new Bullets(bulletTexture, new Rectangle(mainX, mainY, 50, 50));
+            rand = new Random();
+            MainAnimation = new AnimationMain(new Rectangle(mainX, mainY, 50, 50), main, this);
             scrolling1 = new Background(bckg, new Rectangle(0, 0, 800, 500), GraphicsDevice.Viewport.Height, GraphicsDevice.Viewport.Width);
             //Music = new Music(song); Music.Play();
 
@@ -115,18 +122,53 @@ namespace ScrollGame
                 this.Exit();
             if (Keyboard.GetState().IsKeyDown(Keys.Space) && pastKey.IsKeyUp(Keys.Space))
                 Shoot();
+            if (Enemies.Count < 5)
+                EnemyLaunch();
 
             pastKey = Keyboard.GetState();
 
             UpdateBullets();
+            UpdateEnemies();
 
             MainAnimation.Update(gameTime);
-            AnimationEnemy.Update(gameTime);
+
+            foreach (EnemyAnimation enemy in Enemies)
+                enemy.Update(gameTime);
+
+            
             scrolling1.Update();
             
            // Music.Volume();
 
             base.Update(gameTime);
+        }
+
+        public void UpdateEnemies()
+        {
+            foreach (EnemyAnimation enemy in Enemies)
+            {
+                enemy.position.Y += 3;
+                if (enemy.position.Y > GraphicsDevice.Viewport.Height)
+                    enemy.isVisible = false;
+            }
+
+            for (int i = 0; i < Enemies.Count; i++)
+            {
+                if (!Enemies[i].isVisible)
+                {
+                    Enemies.RemoveAt(i);
+                    i--;
+                }
+            }
+        }
+
+        public void EnemyLaunch()
+        {
+            EnemyAnimation newEnemy = new EnemyAnimation(enemy, new Rectangle(rand.Next(800), (rand.Next(200)-200), 50, 50));
+            newEnemy.isVisible = true;
+
+            if (Enemies.Count < 5)
+                Enemies.Add(newEnemy);
         }
 
         public void UpdateBullets()
@@ -153,6 +195,7 @@ namespace ScrollGame
             Bullets newBullet = new Bullets(bulletTexture, new Rectangle(MainAnimation.position.X, MainAnimation.position.Y, 50, 50));
             newBullet.isVisible = true;
 
+            
             if (bullets.Count < 20)
                 bullets.Add(newBullet);
         }
@@ -169,15 +212,36 @@ namespace ScrollGame
 
             spriteBatch.Begin();
             scrolling1.Draw(spriteBatch);
+            
             foreach (Bullets bullet in bullets)
                 bullet.Draw(spriteBatch);
+
+            foreach (EnemyAnimation enemy in Enemies)
+                enemy.Draw(spriteBatch);
+
             spriteBatch.End();
 
 
             MainAnimation.Draw(spriteBatch);
-            AnimationEnemy.Draw(spriteBatch);
-            
+
+            Information();
+
             base.Draw(gameTime);
+        }
+
+        void Information()
+        {
+            if (Keyboard.GetState().IsKeyDown(Keys.I) && pastKey2.IsKeyUp(Keys.I))
+                isShowInformation = !isShowInformation;
+
+            pastKey2 = Keyboard.GetState();
+
+            if (isShowInformation)
+            {
+                spriteBatch.Begin();
+                spriteBatch.DrawString(font, "Nubmer of bullets: " + bullets.Count, new Vector2(GraphicsDevice.Viewport.Width-150, GraphicsDevice.Viewport.Height-85), Color.White);
+                spriteBatch.End();
+            }
         }
     }
 }
