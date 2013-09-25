@@ -1,0 +1,24 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScrollGame", "ScrollGame\ScrollGame\ScrollGame.csproj", "{006A3F21-BCE8-4093-AB24-E7F8AE4F37C2}"
+EndProject
+Project("{96E2B04D-8817-42C6-938A-82C39BA4D311}") = "ScrollGameContent", "ScrollGame\ScrollGameContent\ScrollGameContent.contentproj", "{E1E0D7B6-BD26-4341-A409-73F069C78AE8}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x86 = Debug|x86
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{006A3F21-BCE8-4093-AB24-E7F8AE4F37C2}.Debug|x86.ActiveCfg = Debug|x86
+		{006A3F21-BCE8-4093-AB24-E7F8AE4F37C2}.Debug|x86.Build.0 = Debug|x86
+		{006A3F21-BCE8-4093-AB24-E7F8AE4F37C2}.Release|x86.ActiveCfg = Release|x86
+		{006A3F21-BCE8-4093-AB24-E7F8AE4F37C2}.Release|x86.Build.0 = Release|x86
+		{E1E0D7B6-BD26-4341-A409-73F069C78AE8}.Debug|x86.ActiveCfg = Debug|x86
+		{E1E0D7B6-BD26-4341-A409-73F069C78AE8}.Release|x86.ActiveCfg = Release|x86
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
