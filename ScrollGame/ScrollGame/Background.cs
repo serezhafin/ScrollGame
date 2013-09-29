@@ -30,7 +30,7 @@ namespace ScrollGame
 
         public void Update()
         {
-            screenpos.Y += 3;
+            screenpos.Y += 4;
             screenpos.Y = screenpos.Y % bckg.Height;
         }
 

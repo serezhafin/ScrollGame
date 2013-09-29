@@ -31,6 +31,7 @@ namespace ScrollGame
         SoundEffect sound1;
         SoundEffect sound2;
         Song song;
+        Song song1;
 
         // Положение главного героя
         int mainX, mainY;
@@ -43,16 +44,24 @@ namespace ScrollGame
         int countOfEnemies = 5;
         bool isStarted = false;
         bool isMusicStarted = false;
+        bool cheatMode = false;
+        int numberOfBullets = 20;
+        int velocity = 3;
+        bool isMusicStarted2 = false;
+        int scoreToTheNextLevel = 2000;
+        string bestScore;
 
         // Подгрузка классов
         Random rand;
         KeyboardState pastKey;
         KeyboardState pastKey2;
+        KeyboardState pastKey3;
         AnimationMain MainAnimation;
         List<Bullets> bullets = new List<Bullets>();
         List<EnemyAnimation> Enemies = new List<EnemyAnimation>();
         Background scrolling1;
         Music Music;
+        Music Music2;
         
 
         public Game1()
@@ -100,13 +109,16 @@ namespace ScrollGame
             sound1 = Content.Load<SoundEffect>("shot");
             sound2 = Content.Load<SoundEffect>("explode");
             mainTitle = Content.Load<Texture2D>("title");
+            song1 = Content.Load<Song>("mainMusic");
+            bestScore = System.IO.File.ReadAllText("content\\bestscore");
             
 
             // Создание объектов класса
             rand = new Random();
             MainAnimation = new AnimationMain(new Rectangle(mainX, mainY, 50, 50), main, this);
             scrolling1 = new Background(bckg, new Rectangle(0, 0, 800, 500), GraphicsDevice.Viewport.Height, GraphicsDevice.Viewport.Width);
-            Music = new Music(song); 
+            Music = new Music(song);
+            Music2 = new Music(song1);
 
             
         }
@@ -127,8 +139,31 @@ namespace ScrollGame
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
+            
+            if (scoreToTheNextLevel < score)
+            {
+                countOfEnemies++;
+                scoreToTheNextLevel += score;
+            }
+
             if (Keyboard.GetState().IsKeyDown(Keys.P))
                 paused = true;
+            if (Keyboard.GetState().IsKeyDown(Keys.Q) && pastKey3.IsKeyUp(Keys.Q))
+            {
+                if (cheatMode)
+                {
+                    cheatMode = false;
+                    numberOfBullets = 20;
+                    bullets.Clear();
+                }
+                else
+                {
+                    cheatMode = true;
+                    numberOfBullets = 200;
+                }
+            }
+            pastKey3 = Keyboard.GetState();
+
             if (isStarted)
             {
 
@@ -150,16 +185,28 @@ namespace ScrollGame
                     
                     if (isAlive)
                     {
-                        if (Keyboard.GetState().IsKeyDown(Keys.Space) && pastKey.IsKeyUp(Keys.Space))
+                        if (cheatMode)
                         {
-                            Shoot();
-                            sound1.Play();
+                            if (Keyboard.GetState().IsKeyDown(Keys.Space))
+                            {
+                                Shoot();
+                                sound1.Play();
+                            }
+                            if (Enemies.Count < countOfEnemies)
+                                EnemyLaunch();
                         }
-                        if (Enemies.Count < countOfEnemies)
-                            EnemyLaunch();
-
-                        pastKey = Keyboard.GetState();
-
+                        else
+                        {
+                            if (Keyboard.GetState().IsKeyDown(Keys.Space) && pastKey.IsKeyUp(Keys.Space))
+                            {
+                                Shoot();
+                                sound1.Play();
+                            }
+                            if (Enemies.Count < countOfEnemies)
+                                EnemyLaunch();
+                            pastKey = Keyboard.GetState();
+                        }
+                        // Other Things
                         if (Keyboard.GetState().IsKeyDown(Keys.S))
                             countOfEnemies++;
                         if (Keyboard.GetState().IsKeyDown(Keys.A))
@@ -167,6 +214,8 @@ namespace ScrollGame
                             if ((countOfEnemies - 1) > 0) countOfEnemies--;
                         }
 
+
+                        // Updates
                         UpdateBullets();
                         UpdateEnemies();
 
@@ -199,6 +248,11 @@ namespace ScrollGame
             }
             else
             {
+                if (!isMusicStarted2)
+                {
+                    Music2.Play();
+                    isMusicStarted2 = true;
+                }
                 if (Keyboard.GetState().IsKeyDown(Keys.Enter))
                     isStarted = true;
             }
@@ -208,7 +262,14 @@ namespace ScrollGame
         {
             foreach (EnemyAnimation enemy in Enemies)
             {
-                enemy.position.Y += 3;
+                // Y coord
+                enemy.position.Y += 2;
+                // X coord
+                enemy.position.X += velocity;
+                if (enemy.position.Right-100 >= GraphicsDevice.Viewport.Width)
+                    velocity = -velocity;
+                if (enemy.position.Left+100 <= 0)
+                    velocity = -velocity;
                 if (enemy.position.Y > GraphicsDevice.Viewport.Height)
                     enemy.isVisible = false;
             }
@@ -241,13 +302,13 @@ namespace ScrollGame
                     bullet.isVisible = false;
                 for (int i = 0; i < Enemies.Count; i++)
                 {
-                    if (bullet.bulletPosition.Top < Enemies[i].position.Bottom && bullet.bulletPosition.Left >= Enemies[i].position.Left && bullet.bulletPosition.Left <= Enemies[i].position.Right)
+                    if (bullet.bulletPosition.Top < Enemies[i].position.Bottom && bullet.bulletPosition.Left >= Enemies[i].position.Left && bullet.bulletPosition.Left <= Enemies[i].position.Right && bullet.bulletPosition.Bottom >= Enemies[i].position.Top)
                     {
                         
                         sound2.Play(0.3f,0f,0f);
                         bullet.isVisible = false;
                         Enemies[i].isVisible = false;
-                        score++;
+                        score += 2 * rand.Next(20);
                         break;
                     }
                 }
@@ -265,11 +326,11 @@ namespace ScrollGame
 
         public void Shoot()
         {
-            Bullets newBullet = new Bullets(bulletTexture, new Rectangle(MainAnimation.position.X, MainAnimation.position.Y, 50, 50));
+            Bullets newBullet = new Bullets(bulletTexture, new Rectangle(MainAnimation.position.X, MainAnimation.position.Y, 18, 6));
             newBullet.isVisible = true;
 
             
-            if (bullets.Count < 20)
+            if (bullets.Count < numberOfBullets)
                 bullets.Add(newBullet);
         }
 
@@ -295,7 +356,7 @@ namespace ScrollGame
                     enemy.Draw(spriteBatch);
 
                 Checking();
-                spriteBatch.DrawString(font2, "Score: " + score, new Vector2(50, 50), Color.White);
+                spriteBatch.DrawString(font2, "Score: " + score, new Vector2(50, 70), Color.White);
 
                 spriteBatch.End();
 
@@ -330,7 +391,7 @@ namespace ScrollGame
             if (isShowInformation)
             {
                 spriteBatch.Begin();
-                spriteBatch.DrawString(font2, "Nubmer of bullets: " + bullets.Count + "\nNumber of Enemies: " + Enemies.Count, new Vector2(GraphicsDevice.Viewport.Width-150, GraphicsDevice.Viewport.Height-85), Color.White);
+                spriteBatch.DrawString(font2, "Nubmer of bullets: " + bullets.Count + "\nNumber of Enemies: " + Enemies.Count + "\nCheatMode: " + cheatMode, new Vector2(GraphicsDevice.Viewport.Width-150, GraphicsDevice.Viewport.Height-85), Color.White);
                 spriteBatch.End();
             }
         }
@@ -342,8 +403,14 @@ namespace ScrollGame
                 if (MainAnimation.position.Top+15 <= Enemies[i].position.Bottom && MainAnimation.position.Bottom >= Enemies[i].position.Top && MainAnimation.position.Right-20 >= Enemies[i].position.Left && MainAnimation.position.Left+20 <= Enemies[i].position.Right)
                 {
                     spriteBatch.Draw(Content.Load<Texture2D>("lose"), new Rectangle(0, 0, 800, 500), Color.White);
-                    spriteBatch.DrawString(font, score.ToString(), new Vector2(400, 295), Color.Black);
+                    spriteBatch.DrawString(font,"Your score:" + score.ToString(), new Vector2(275, 305), Color.White);
                     isAlive = false;
+                    if (score > int.Parse(bestScore))
+                    {
+                        bestScore = score.ToString();
+                        System.IO.File.WriteAllText("content\\bestscore", score.ToString());
+                    }
+                    spriteBatch.DrawString(font,"Best Score:" + bestScore, new Vector2(275, 330),Color.White);
                 }
             }
         }
